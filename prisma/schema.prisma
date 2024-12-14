@@ -1,0 +1,552 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FiscalCalendar {
+    id  String  @id @default(uuid())
+    name                String
+    fiscalYearStartMonth  Int
+    fiscalYearStartDay    Int
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    accountingPeriods AccountingPeriod[]
+}
+
+model AccountingCalendar {
+    id String @id @default(uuid())
+    name String
+    description String?
+    timeZone String
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    holidays AccountingCalendarHoliday[]
+    priceLists PriceList[]
+}
+
+model AccountingCalendarHoliday {
+    id String @id @default(uuid())
+    accountingCalendarId String
+    accountingCalendar AccountingCalendar @relation(fields: [accountingCalendarId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    holidayDate DateTime
+    description String?
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model AccountingPeriod {
+    id  String  @id @default(uuid())
+    fiscalCalendarId    String
+    fiscalCalendar      FiscalCalendar @relation(fields: [fiscalCalendarId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    periodName          String
+    startDate           DateTime
+    endDate             DateTime
+    status              String
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model AssetType {
+    id String @id @default(uuid())
+    name String
+    description String?
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    investments Investment[]
+}
+
+model Broker {
+    id String @id @default(uuid())
+    name String
+    description String?
+    brokerTypeId String
+    brokerType BrokerType @relation(fields: [brokerTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    transactions Transaction[]
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model BrokerType {
+    id String @id @default(uuid())
+    name String
+    description String?
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    brokers Broker[]
+}
+
+model Country {
+    id String @id @default(uuid())
+    name String
+    isoCode String
+    isoCode3 String
+    region String?
+    isEUMember Boolean
+    isActive Boolean
+    withholdingTaxTypes WithholdingTaxType[]
+    issuers Issuer[]
+    exchanges Exchange[]
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model WithholdingTaxType {
+    id String @id @default(uuid())
+    name String
+    countryId String
+    country Country @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    taxRate Float
+    description String?
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model Exchange {
+    id String @id @default(uuid())
+    name String
+    countryId String
+    country Country @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    description String?
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    investments Investment[]
+}
+
+model Custodian {
+    id String @id @default(uuid())
+    name String
+    custodianAccounts CustodianAccount[]
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model CustodianAccount {
+    id String @id @default(uuid())
+    name String
+    description String?
+    custodianId String
+    custodian Custodian @relation(fields: [custodianId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    accountNumber String
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    positions Position[]
+    transactions Transaction[]
+}
+
+model BusinessUnit {
+    id String @id @default(uuid())
+    name String
+    subBusinessUnits SubBusinessUnit[]
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model SubBusinessUnit {
+    id String @id @default(uuid())
+    name String
+    businessUnitId String
+    businessUnit BusinessUnit @relation(fields: [businessUnitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    description String?
+    strategies Strategy[]
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model Industry {
+    id String @id @default(uuid())
+    name String
+    description String?
+    industryGroupId String
+    industryGroup IndustryGroup @relation(fields: [industryGroupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    investments Investment[]
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model IndustryGroup {
+    id String @id @default(uuid())
+    sectorId String
+    sector Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    name String
+    description String?
+    industries Industry[]
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model Sector {
+    id String @id @default(uuid())
+    name String
+    description String?
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    industryGroups IndustryGroup[]
+}
+
+model Strategy {
+    id String @id @default(uuid())
+    name String
+    subBusinessId String
+    subBusinessUnit SubBusinessUnit @relation(fields: [subBusinessId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    description String?
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    positions Position[]
+    transactions Transaction[]
+}
+
+model TaxStatus {
+    id String @id @default(uuid())
+    name String
+    description String?
+    isTaxExempt Boolean
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model InvestmentType {
+    id String @id @default(uuid())
+    name String
+    description String?
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    investments Investment[]
+}
+
+model Issuer {
+    id String @id @default(uuid())
+    name String
+    description String?
+    countryId String
+    country Country @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    investments Investment[]
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model MediumOfExchange {
+    id String @id @default(uuid())
+    name String
+    isBaseCurrency Boolean
+    decimalPlaces Int
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    investments Investment[]
+}
+
+model Portfolio {
+    id String @id @default(uuid())
+    name String
+    description String?
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    allocationPortfolios AllocationPortfolio[]
+    positions Position[]
+    transactions Transaction[]
+}
+
+model AllocationTemplate {
+    id String @id @default(uuid())
+    name String
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    allocationPortfolios AllocationPortfolio[]
+}
+
+model AllocationPortfolio {
+    id String @id @default(uuid())
+    portfolioId String
+    portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    targetRatio Float
+    allocationTemplateId String
+    allocationTemplate AllocationTemplate @relation(fields: [allocationTemplateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+
+model Investment {
+    id String @id @default(uuid())
+    code String
+    description String?
+    assetTypeId String
+    assetType AssetType @relation(fields: [assetTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    investmentTypeId String
+    investmentType InvestmentType @relation(fields: [investmentTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    exchangeId String
+    exchange Exchange @relation(fields: [exchangeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    industryId String
+    industry Industry @relation(fields: [industryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    issuerId String
+    issuer Issuer @relation(fields: [issuerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    cusip String?
+    isin String?
+    sedol String?
+    ticker String?
+    bloombergId String?
+    pricingFactor Float
+    tradingFactor Float
+    coupon Float?
+    maturityDate DateTime?
+    issueDate DateTime?
+    activeDate DateTime?
+    inactiveDate DateTime?
+    className String?
+    mediumOfExchangeId String
+    mediumOfExchange MediumOfExchange @relation(fields: [mediumOfExchangeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    prices Price[]
+    positions Position[]
+    transactions Transaction[]
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model Position {
+    id String @id @default(uuid())
+    portfolioId String
+    portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    investmentId String
+    investment Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    quantity Float
+    costUnit Float
+    marketValueBook Float
+    totalQuantity Float
+    marketPriceLocalEnd Float
+    aIBookEnd Float
+    totalNAV Float
+    asOfDate DateTime
+    custodianAccountId String
+    custodianAccount CustodianAccount @relation(fields: [custodianAccountId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    strategyId String
+    strategy Strategy @relation(fields: [strategyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+
+model Price {
+    id String @id @default(uuid())
+    investmentId String
+    investment Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    priceDate DateTime
+    priceType String
+    priceSourceId String
+    priceSource PriceSource @relation(fields: [priceSourceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    priceListId String
+    priceList PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    price Float
+    denominationCurrency String
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model PriceList {
+    id String @id @default(uuid())
+    name String
+    description String?
+    accountingCalendarId String
+    accountingCalendar AccountingCalendar @relation(fields: [accountingCalendarId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    isActive Boolean
+    prices Price[]
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+
+model PriceSource {
+    id String @id @default(uuid())
+    name String
+    priority Int
+    isActive Boolean
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+    prices Price[]
+}
+
+model Transaction {
+    id String @id @default(uuid())
+    portfolioId String
+    portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    investmentId String
+    investment Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    brokerId String
+    broker Broker @relation(fields: [brokerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    custodianAccountId String
+    custodianAccount CustodianAccount @relation(fields: [custodianAccountId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    strategyId String
+    strategy Strategy @relation(fields: [strategyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    tradeDate DateTime
+    settleDate DateTime
+    actualSettleDate DateTime?
+    quantity Float
+    price Float
+    investmentAccruedInterest Float
+    counterSDateFx Float
+    counterTDateFx Float
+    netInvestmentAmount Float
+    netCounterAmount Float
+    secFeeAmount Float
+    totalCommission Float
+    accruedInterest Float
+    transactionType String
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
+
+model User{
+    id String @id @default(uuid())
+    email String @unique
+    password String
+    name String
+    createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+
+}
+
+model ChartOfAccounts {
+    id String @id @default(uuid())
+    accountId String @unique
+    description String
+    baseType String
+    accountRole String
+    accountClass String
+    accountSubType String
+     createdAt DateTime @default(now())
+    createdBy String?
+    updatedAt DateTime @updatedAt
+    updatedBy String?
+    deletedAt DateTime?
+    deletedBy String?
+}
